@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Farhantik.io - TikTok Downloader</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #0f172a, #1e293b);
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #38bdf8;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    input, select {
+      background-color: #1e293b;
+      color: white;
+    }
+    button {
+      background-color: #22d3ee;
+      color: #0f172a;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #0ea5e9;
+    }
+    .result {
+      margin-top: 1rem;
+    }
+    .error {
+      color: #f87171;
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 2rem;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Farhantik.io Downloader</h1>
+    <p>Download TikTok videos without watermark or convert to MP3.</p>
+    <input id="url" placeholder="Paste TikTok video link here..." />
+    <select id="format">
+      <option value="video">Video (No Watermark)</option>
+      <option value="music">MP3 (Audio)</option>
+    </select>
+    <button onclick="downloadTikTok()">Download</button>
+    <div class="result" id="result"></div>
+    <footer>
+      &copy; 2025 Farhantik.io — Unofficial TikTok Downloader
+    </footer>
+  </div>
+
+  <script>
+    async function downloadTikTok() {
+      const url = document.getElementById("url").value.trim();
+      const format = document.getElementById("format").value;
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "Loading...";
+
+      if (!url || !url.includes("tiktok.com")) {
+        resultDiv.innerHTML = "<div class='error'>❌ Please enter a valid TikTok link</div>";
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://api.tikwm.com/?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+
+        if (!data.data) throw new Error(data.msg || "Invalid video");
+
+        let title = data.data.title || "TikTok Download";
+        let thumb = data.data.cover;
+        let link = format === "music" ? data.data.music : data.data.play;
+
+        resultDiv.innerHTML = `
+          <div>
+            <img src="${thumb}" alt="Thumbnail" width="100%" style="border-radius:10px; max-width: 400px; margin-bottom: 1rem;">
+            <p><strong>${title}</strong></p>
+            <a href="${link}" download target="_blank">
+              <button style="margin-top: 1rem;">Click to Download ${format.toUpperCase()}</button>
+            </a>
+          </div>
+        `;
+      } catch (err) {
+        resultDiv.innerHTML = `<div class='error'>❌ ${err.message}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
+
